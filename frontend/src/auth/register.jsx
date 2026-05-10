@@ -1,6 +1,20 @@
 import { useState } from "react";
 import api from "../api/axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
+
+import {
+  Box,
+  Button,
+  Card,
+  Flex,
+  Field,
+  Heading,
+  Input,
+  Link,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -8,7 +22,7 @@ const Register = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({
@@ -22,7 +36,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       const res = await api.post("register/", formData);
-navigate("/login");
+      navigate("/login");
     } catch (error) {
       alert(error.response?.data?.detail || "An error occurred");
     } finally {
@@ -31,63 +45,107 @@ navigate("/login");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create an account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Join us today and start your journey
-          </p>
-        </div>
+    <Flex
+      minH="100vh"
+      align="center"
+      justify="center"
+      px={4}
+    >
+      <Card.Root
+        w="full"
+        maxW="md"
+        borderRadius="2xl"
+        shadow="xl"
+        border="1px solid"
+        borderColor="gray.200"
+      >
+        <Card.Body p={10}>
+          <Stack gap={8}>
+            <Box textAlign="center">
+              <Heading
+                size="2xl"
+                fontWeight="extrabold"
+              >
+                Create an account
+              </Heading>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Enter your username"
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="••••••••"
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+              <Text mt={2} fontSize="sm">
+                Join us today and start your journey
+              </Text>
+            </Box>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white ${
-                isLoading ? "bg-indigo-400" : "bg-indigo-600 hover:bg-indigo-700"
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200`}
+            <form onSubmit={handleSubmit}>
+              <Stack gap={5}>
+                <Field.Root required>
+                  <Field.Label>Username</Field.Label>
+
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="johndoe"
+                    size="lg"
+                    borderRadius="xl"
+                    onChange={handleChange}
+                  />
+                </Field.Root>
+
+                <Field.Root required>
+                  <Field.Label>Password</Field.Label>
+
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    size="lg"
+                    borderRadius="xl"
+                    onChange={handleChange}
+                  />
+                </Field.Root>
+
+                <Button
+                  type="submit"
+                  size="lg"
+                  colorScheme="purple"
+                  borderRadius="xl"
+                  fontWeight="bold"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <Flex align="center" gap={2}>
+                      <Spinner size="sm" />
+                      <Text>Creating account...</Text>
+                    </Flex>
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </Stack>
+            </form>
+
+            <Text
+              textAlign="center"
+              fontSize="sm"
+              color="gray.600"
             >
-              {isLoading ? "Processing..." : "Register"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              Already have an account?{" "}
+              <Link
+                as={RouterLink}
+                to="/login"
+                color="purple.500"
+                fontWeight="medium"
+                _hover={{
+                  textDecoration: "underline",
+                }}
+              >
+                Sign in
+              </Link>
+            </Text>
+          </Stack>
+        </Card.Body>
+      </Card.Root>
+    </Flex>
   );
 };
 
