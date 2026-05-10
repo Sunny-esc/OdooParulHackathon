@@ -78,6 +78,7 @@ class City(models.Model):
     tourism_rating = models.FloatField(default=0.0)
     attractions_count = models.IntegerField(default=0)
     popularity_score = models.FloatField(default=0.0)
+    country = models.CharField(max_length=100, default="Unknown")
     
     # Average Costs for smarter budgeting
     avg_food_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
