@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Box, Container } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 
 import Login from "./auth/login";
 import Register from "./auth/register";
@@ -23,26 +23,24 @@ function App() {
   return (
     <Layout>
       <Box minH="100vh" bg="bg">
-        <Container maxW="container.xl" py={6}>
-          <Routes>
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
-            <Route path="/trips" element={<ProtectedRoute><MyTrips /></ProtectedRoute>} />
-            <Route path="/itinerary-builder" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
-            <Route path="/itinerary-view" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
-            <Route path="/cities" element={<ProtectedRoute><CitySearch /></ProtectedRoute>} />
-            <Route path="/activities" element={<ProtectedRoute><ActivitySearch /></ProtectedRoute>} />
-            <Route path="/budget" element={<ProtectedRoute><Budget /></ProtectedRoute>} />
-            <Route path="/packing" element={<ProtectedRoute><Packing /></ProtectedRoute>} />
-            <Route path="/shared-itinerary" element={<ProtectedRoute><SharedItinerary /></ProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
-            <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="*" element={<Navigate to="/dashboard" />} />
-          </Routes>
-        </Container>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
+          <Route path="/trips" element={<ProtectedRoute><MyTrips /></ProtectedRoute>} />
+          <Route path="/itinerary-builder" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
+          <Route path="/itinerary-view" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+          <Route path="/cities" element={<ProtectedRoute><CitySearch /></ProtectedRoute>} />
+          <Route path="/activities" element={<ProtectedRoute><ActivitySearch /></ProtectedRoute>} />
+          <Route path="/budget" element={<ProtectedRoute><Budget /></ProtectedRoute>} />
+          <Route path="/packing" element={<ProtectedRoute><Packing /></ProtectedRoute>} />
+          <Route path="/shared-itinerary" element={<ProtectedRoute><SharedItinerary /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
       </Box>
     </Layout>
   );

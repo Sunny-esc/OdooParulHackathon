@@ -14,9 +14,14 @@ import {
   VStack,
   Badge,
   Skeleton,
+  Card,
+  AspectRatio,
+  Icon,
+  HStack,
 } from "@chakra-ui/react";
 import { useColorModeValue } from "../components/ui/color-mode";
 import { getDestinations, getActivities } from "../services/mockData";
+import { FiMapPin, FiPlus } from "react-icons/fi";
 
 const CreateTrip = () => {
   const [formValues, setFormValues] = useState({
@@ -48,81 +53,182 @@ const CreateTrip = () => {
     alert("Trip created successfully. This page is powered by the mocked frontend layer.");
   };
 
+  const pageBg = useColorModeValue("gray.50", "gray.900");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const mutedText = useColorModeValue("gray.600", "gray.300");
+  const accentBg = useColorModeValue("gray.100", "gray.700");
+
   return (
-    <Box p={{ base: 4, md: 8 }}>
-      <Stack spacing={8}>
-        <Box bg={useColorModeValue("white", "gray.700")} rounded="3xl" p={8} shadow="base">
-          <Heading size="lg" mb={2}>Create a new trip</Heading>
-          <Text color={useColorModeValue("gray.600", "gray.300")} mb={6}>Build your itinerary with destination suggestions, travel details, and activity inspiration.</Text>
-          <Stack spacing={6} as="form" onSubmit={handleSubmit}>
-            <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-              <Field.Root>
-                <Field.Label>Trip name</Field.Label>
-                <Input value={formValues.name} onChange={handleChange("name")} placeholder="My Bali escape" />
-              </Field.Root>
-              <Field.Root>
-                <Field.Label>Cover image</Field.Label>
-                <Input type="file" accept="image/*" onChange={handleChange("cover")} />
-              </Field.Root>
-              <Field.Root>
-                <Field.Label>Start date</Field.Label>
-                <Input type="date" value={formValues.startDate} onChange={handleChange("startDate")} />
-              </Field.Root>
-              <Field.Root>
-                <Field.Label>End date</Field.Label>
-                <Input type="date" value={formValues.endDate} onChange={handleChange("endDate")} />
-              </Field.Root>
-            </SimpleGrid>
+    <Box minH="100vh" bg={pageBg}>
+      <Stack spacing={12}>
+        <Box textAlign="center" py={12}>
+          <Heading size="2xl" mb={4} color="blue.600">
+            Plan Your Dream Trip
+          </Heading>
+          <Text fontSize="xl" color={mutedText} maxW="2xl" mx="auto">
+            Build your itinerary with destination suggestions, travel details, and activity inspiration.
+          </Text>
+        </Box>
 
-            <Field.Root>
-              <Field.Label>Description</Field.Label>
-              <Textarea value={formValues.description} onChange={handleChange("description")} minH="160px" placeholder="Add a short summary for this trip" />
-            </Field.Root>
+        <Box mx={{ base: 4, md: 0 }}>
+          <Card.Root bg={cardBg} shadow="sm" borderRadius="2xl" overflow="hidden">
+            <Card.Body p={8}>
+              <Stack spacing={8} as="form" onSubmit={handleSubmit}>
+                <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
+                  <Field.Root>
+                    <Field.Label fontSize="lg" fontWeight="semibold">Trip name</Field.Label>
+                    <Input
+                      value={formValues.name}
+                      onChange={handleChange("name")}
+                      placeholder="My Bali escape"
+                      size="lg"
+                      bg={useColorModeValue("gray.50", "gray.700")}
+                      border="none"
+                      _focus={{ bg: useColorModeValue("white", "gray.600") }}
+                      borderRadius="xl"
+                    />
+                  </Field.Root>
+                  <Field.Root>
+                    <Field.Label fontSize="lg" fontWeight="semibold">Cover image</Field.Label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleChange("cover")}
+                      size="lg"
+                      bg={useColorModeValue("gray.50", "gray.700")}
+                      border="none"
+                      _focus={{ bg: useColorModeValue("white", "gray.600") }}
+                      borderRadius="xl"
+                    />
+                  </Field.Root>
+                  <Field.Root>
+                    <Field.Label fontSize="lg" fontWeight="semibold">Start date</Field.Label>
+                    <Input
+                      type="date"
+                      value={formValues.startDate}
+                      onChange={handleChange("startDate")}
+                      size="lg"
+                      bg={useColorModeValue("gray.50", "gray.700")}
+                      border="none"
+                      _focus={{ bg: useColorModeValue("white", "gray.600") }}
+                      borderRadius="xl"
+                    />
+                  </Field.Root>
+                  <Field.Root>
+                    <Field.Label fontSize="lg" fontWeight="semibold">End date</Field.Label>
+                    <Input
+                      type="date"
+                      value={formValues.endDate}
+                      onChange={handleChange("endDate")}
+                      size="lg"
+                      bg={useColorModeValue("gray.50", "gray.700")}
+                      border="none"
+                      _focus={{ bg: useColorModeValue("white", "gray.600") }}
+                      borderRadius="xl"
+                    />
+                  </Field.Root>
+                </SimpleGrid>
 
-            <Box>
-              <Heading size="md" mb={4}>Suggested destinations</Heading>
-              <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                {(loading ? Array.from({ length: 3 }) : destinations).map((destination, index) => (
-                  <Box key={destination?.id || index} bg={useColorModeValue("gray.50", "gray.800")} rounded="2xl" p={4} borderWidth="1px" borderColor={useColorModeValue("gray.200", "gray.600")}>
-                    <Skeleton isLoaded={!loading}>
-                      <Text fontWeight="semibold">{destination?.name}</Text>
-                    </Skeleton>
-                    <Skeleton isLoaded={!loading} mt={1}>
-                      <Text fontSize="sm">{destination?.country}</Text>
-                    </Skeleton>
-                    <Skeleton isLoaded={!loading} mt={3}>
-                      <Badge colorScheme="purple">{destination?.cost}</Badge>
-                    </Skeleton>
-                  </Box>
-                ))}
-              </SimpleGrid>
-            </Box>
+                <Field.Root>
+                  <Field.Label fontSize="lg" fontWeight="semibold">Description</Field.Label>
+                  <Textarea
+                    value={formValues.description}
+                    onChange={handleChange("description")}
+                    minH="120px"
+                    placeholder="Add a short summary for this trip"
+                    size="lg"
+                    bg={useColorModeValue("gray.50", "gray.700")}
+                    border="none"
+                    _focus={{ bg: useColorModeValue("white", "gray.600") }}
+                    borderRadius="xl"
+                  />
+                </Field.Root>
 
-            <Box>
-              <Heading size="md" mb={4}>Activity suggestions</Heading>
-              <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
-                {(loading ? Array.from({ length: 3 }) : activities).map((activity, index) => (
-                  <Box key={activity?.id || index} bg={useColorModeValue("gray.50", "gray.800")} rounded="2xl" p={4} borderWidth="1px" borderColor={useColorModeValue("gray.200", "gray.600")}>
-                    <Skeleton isLoaded={!loading}>
-                      <Text fontWeight="semibold">{activity?.title}</Text>
-                    </Skeleton>
-                    <Skeleton isLoaded={!loading} mt={1}>
-                      <Text fontSize="sm">{activity?.category}</Text>
-                    </Skeleton>
-                    <Skeleton isLoaded={!loading} mt={2}>
-                      <Text fontSize="xs" color={useColorModeValue("gray.600", "gray.400")}>
-                        {activity?.description}
-                      </Text>
-                    </Skeleton>
-                  </Box>
-                ))}
-              </SimpleGrid>
-            </Box>
+                <Box>
+                  <Heading size="lg" mb={6}>Suggested destinations</Heading>
+                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    {(loading ? Array.from({ length: 3 }) : destinations).map((destination, index) => (
+                      <Card.Root
+                        key={destination?.id || index}
+                        bg={accentBg}
+                        shadow="sm"
+                        borderRadius="xl"
+                        overflow="hidden"
+                        transition="all 0.2s"
+                        _hover={{ transform: "translateY(-2px)", shadow: "md" }}
+                        cursor="pointer"
+                      >
+                        <AspectRatio ratio={16 / 9}>
+                          <Box bg={useColorModeValue("gray.200", "gray.600")} display="flex" alignItems="center" justifyContent="center">
+                            <Icon as={FiMapPin} boxSize={8} color={mutedText} />
+                          </Box>
+                        </AspectRatio>
+                        <Card.Body p={4}>
+                          <Skeleton isLoaded={!loading}>
+                            <Text fontWeight="semibold" mb={1}>{destination?.name}</Text>
+                          </Skeleton>
+                          <Skeleton isLoaded={!loading} mb={3}>
+                            <Text fontSize="sm" color={mutedText}>{destination?.country}</Text>
+                          </Skeleton>
+                          <Skeleton isLoaded={!loading}>
+                            <Badge colorScheme="purple" variant="subtle">{destination?.cost}</Badge>
+                          </Skeleton>
+                        </Card.Body>
+                      </Card.Root>
+                    ))}
+                  </SimpleGrid>
+                </Box>
 
-            <Flex justify="flex-end">
-              <Button type="submit" colorScheme="blue" size="lg">Create trip</Button>
-            </Flex>
-          </Stack>
+                <Box>
+                  <Heading size="lg" mb={6}>Activity suggestions</Heading>
+                  <SimpleGrid columns={{ base: 1, md: 3 }} gap={4}>
+                    {(loading ? Array.from({ length: 3 }) : activities).map((activity, index) => (
+                      <Card.Root
+                        key={activity?.id || index}
+                        bg={accentBg}
+                        shadow="sm"
+                        borderRadius="xl"
+                        overflow="hidden"
+                        transition="all 0.2s"
+                        _hover={{ transform: "translateY(-2px)", shadow: "md" }}
+                        cursor="pointer"
+                      >
+                        <Card.Body p={4}>
+                          <Skeleton isLoaded={!loading}>
+                            <Text fontWeight="semibold" mb={1}>{activity?.title}</Text>
+                          </Skeleton>
+                          <Skeleton isLoaded={!loading} mb={2}>
+                            <Badge colorScheme="blue" variant="subtle" size="sm">{activity?.category}</Badge>
+                          </Skeleton>
+                          <Skeleton isLoaded={!loading}>
+                            <Text fontSize="sm" color={mutedText} lineHeight="1.4">
+                              {activity?.description}
+                            </Text>
+                          </Skeleton>
+                        </Card.Body>
+                      </Card.Root>
+                    ))}
+                  </SimpleGrid>
+                </Box>
+
+                <Flex justify="center" pt={4}>
+                  <Button
+                    type="submit"
+                    colorScheme="blue"
+                    size="lg"
+                    px={12}
+                    borderRadius="xl"
+                    leftIcon={<FiPlus />}
+                    shadow="lg"
+                    _hover={{ transform: "translateY(-2px)", shadow: "xl" }}
+                    transition="all 0.2s"
+                  >
+                    Create trip
+                  </Button>
+                </Flex>
+              </Stack>
+            </Card.Body>
+          </Card.Root>
         </Box>
       </Stack>
     </Box>

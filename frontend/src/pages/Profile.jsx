@@ -86,7 +86,7 @@ const Profile = () => {
 </Tag.Root>
 
               ))}
-              <Button variant="outline" colorScheme="red" mt={6}>Delete account</Button>
+              <Button variant="solid" style={{backgroundColor:"red"}} mt={6}>Delete account</Button>
             </Stack>
           </Box>
         </SimpleGrid>

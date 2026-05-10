@@ -29,7 +29,7 @@ const ItineraryView = () => {
         </Box>
 
         <Box bg={useColorModeValue("white", "gray.700")} rounded="3xl" p={6} shadow="sm">
-          <Tabs.Root defaultValue="timeline" colorPalette="blue">
+          <Tabs.Root defaultValue="timeline" colorScheme="blue">
             <Tabs.List>
               <Tabs.Trigger value="timeline">Timeline</Tabs.Trigger>
               <Tabs.Trigger value="list">List</Tabs.Trigger>

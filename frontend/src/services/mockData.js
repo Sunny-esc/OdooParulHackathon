@@ -8,6 +8,8 @@ export const mockDestinations = [
     popularity: 92,
     cost: "$$",
     details: "Beachside temples, rice terraces, and ocean sunsets.",
+    lat: -8.4095,
+    lng: 115.1889,
   },
   {
     id: 2,
@@ -16,6 +18,8 @@ export const mockDestinations = [
     popularity: 88,
     cost: "$$$",
     details: "Historic neighborhoods, coastal views, and café culture.",
+    lat: 38.7223,
+    lng: -9.1393,
   },
   {
     id: 3,
@@ -24,6 +28,8 @@ export const mockDestinations = [
     popularity: 85,
     cost: "$$$$",
     details: "Adventure hub surrounded by alpine lakes and mountains.",
+    lat: -45.0312,
+    lng: 168.6626,
   },
 ];
 

@@ -18,11 +18,14 @@ const Navbar = () => {
   return (
     <Box as="header" bg="white" borderBottom="1px" borderColor="gray.200" px={{ base: 4, md: 8 }} py={4} shadow="sm" display={{ base: "block", lg: "none" }}>
       <Flex align="center" justify="space-between">
-        <Link as={RouterLink} to="/dashboard" fontWeight="bold" fontSize="lg" color="travel.500">
+        <Link as={RouterLink} to="/dashboard" fontWeight="bold" fontSize="lg" color="blue.500">
           Traveloop
         </Link>
         <Flex align="center" gap={3}>
-          <Avatar size="sm" name={user?.username || "Traveler"} />
+          <Avatar.Root size="sm">
+            <Avatar.Fallback name={user?.username || "Traveler"} />
+            <Avatar.Image src="https://bit.ly/sage-adebayo" />
+          </Avatar.Root>
           <Text display={{ base: "none", md: "block" }}>Welcome {user?.username || "Traveler"}</Text>
           <Button size="sm" variant="outline" onClick={logout}>
             Logout

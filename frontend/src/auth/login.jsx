@@ -140,7 +140,7 @@ const Login = () => {
                 <Button
                   type="submit"
                   size="lg"
-                  colorPalette="purple"
+                  colorScheme="purple"
                   borderRadius="xl"
                   fontWeight="bold"
                   disabled={isLoading}
