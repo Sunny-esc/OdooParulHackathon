@@ -69,8 +69,7 @@ class TripNote(models.Model):
         
         
 class City(models.Model):
-    name = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True) # Add db_index=True    country = models.CharField(max_length=100)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     population = models.IntegerField(default=0)

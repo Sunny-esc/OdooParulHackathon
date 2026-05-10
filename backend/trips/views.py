@@ -176,3 +176,17 @@ class GlobalActivityViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]
     search_fields = ['name', 'city__name']
     filterset_fields = ['city']
+    
+from rest_framework.pagination import PageNumberPagination
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 100       # Default items per page
+    page_size_query_param = 'page_size'
+    max_page_size = 400    # Maximum items the frontend can request
+
+class CityViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = City.objects.all().order_by('-population') # Order by pop so famous cities show first
+    serializer_class = CitySerializer
+    pagination_class = StandardResultsSetPagination # Apply the limit here
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name', 'country']
