@@ -22,7 +22,7 @@ class TripSerializer(serializers.ModelSerializer):
     stats_summary = serializers.SerializerMethodField()
     class Meta:
         model = Trip
-        fields = ['id', 'name', 'description', 'start_date', 'end_date', 'is_public', 'stops']
+        fields = ['id', 'name', 'description', 'start_date', 'end_date', 'is_public', 'stops', 'stats_summary','total_budget']
     def get_stats_summary(self, obj):
         stop_count = obj.stops.count()
         activity_count = Activity.objects.filter(stop__trip=obj).count()

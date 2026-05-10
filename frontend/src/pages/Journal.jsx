@@ -48,7 +48,7 @@ const Journal = () => {
           <Stack spacing={4}>
             <Field.Root>
               <Field.Label>Day</Field.Label>
-              <Input value={newDay} onChange={(e) => setNewDay(e.target.value)} placeholder="Day 1" />
+              <Input value={newDay} onChange={(e) => setNewDay(e.target.value)} placeholder="Day 1" p={4} />
             </Field.Root>
             <Field.Root>
               <Field.Label>Note</Field.Label>

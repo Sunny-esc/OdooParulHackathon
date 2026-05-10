@@ -55,13 +55,13 @@ const ActivitySearch = () => {
   const accentBg = useColorModeValue("gray.100", "gray.700");
 
   return (
-    <Box minH="100vh" bg={pageBg}>
+    <Box minH="100vh" bg={pageBg} p={{sm:2,md:6}}>
       <Stack spacing={12}>
         <Box textAlign="center" py={12}>
-          <Heading size="2xl" mb={4} color="blue.600">
+          <Heading size="2xl" mb={4} color="travel.fg" style={{ fontSize: "2rem", fontWeight:"bold"}}>
             Discover Experiences
           </Heading>
-          <Text fontSize="xl" color={mutedText} maxW="2xl" mx="auto">
+          <Text fontSize="xl" color={mutedText} maxW="2xl" mx="auto" >
             Find curated activities, guided tours, and premium experiences to enrich your next itinerary.
           </Text>
         </Box>
@@ -86,6 +86,7 @@ const ActivitySearch = () => {
                     border="none"
                     _focus={{ bg: useColorModeValue("white", "gray.600") }}
                     size="lg"
+                    p={4}
                   />
                 </Box>
                 <NativeSelect.Root maxW={{ base: "100%", md: "240px" }}>

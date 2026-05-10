@@ -3,227 +3,423 @@ import {
   Badge,
   Box,
   Button,
-  Flex,
+  Card,
   Heading,
+  HStack,
+  Icon,
   Input,
+  InputGroup,
+  NativeSelect,
   SimpleGrid,
   Stack,
   Text,
-  Select,
-  createListCollection,
-  Card,
-  AspectRatio,
-  Icon,
-  HStack,
   VStack,
+  Flex,
+  Skeleton,
 } from "@chakra-ui/react";
-import { getDestinations } from "../services/mockData";
-import { useColorModeValue } from "../components/ui/color-mode";
-import { FiMapPin, FiSearch, FiStar } from "react-icons/fi";
+
+import {
+  FiMapPin,
+  FiSearch,
+  FiStar,
+} from "react-icons/fi";
+
+import { getCities } from "../api/cityService";
 import CityMap from "../components/CityMap";
 
-const costOptions = createListCollection({
-  items: [
-    { label: "$$", value: "$$" },
-    { label: "$$$", value: "$$$" },
-    { label: "$$$$", value: "$$$$" },
-  ],
-});
+const costOptions = ["$", "$$", "$$$"];
 
 const CitySearch = () => {
   const [cities, setCities] = useState([]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("");
   const [selectedCity, setSelectedCity] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCities = async (searchTerm = "") => {
+    setLoading(true);
+
+    try {
+      const data = await getCities({
+        search: searchTerm,
+        page_size: 100,
+      });
+
+      setCities(
+        Array.isArray(data)
+          ? data
+          : data.results || []
+      );
+    } catch (error) {
+      console.error("Failed to fetch cities", error);
+      setCities([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    getDestinations().then(setCities);
-  }, []);
+    fetchCities(query);
+  }, [query]);
 
   const filteredCities = cities.filter((city) => {
-    const matchesQuery = city.name.toLowerCase().includes(query.toLowerCase()) || city.country.toLowerCase().includes(query.toLowerCase());
-    const matchesFilter = filter ? city.cost === filter : true;
-    return matchesQuery && matchesFilter;
+    if (!filter) return true;
+    return city.cost_level === filter;
   });
 
-  const pageBg = useColorModeValue("gray.50", "gray.900");
-  const cardBg = useColorModeValue("white", "gray.800");
-  const mutedText = useColorModeValue("gray.600", "gray.300");
-  const accentBg = useColorModeValue("gray.100", "gray.700");
-
   return (
-    <Box minH="100vh" bg={pageBg}>
-      <Stack spacing={12}>
-        <Box textAlign="center" py={12}>
-          <Heading size="2xl" mb={4} color="blue.600">
+    <Box
+      minH="100vh"
+      bg="bg.canvas"
+      px={{ base: 4, md: 6 }}
+      py={10}
+    >
+      <Stack gap={10}>
+        {/* Hero */}
+        <Box textAlign="center">
+          <Heading
+            size="3xl"
+            color="travel.fg"
+            mb={4}
+            style={{ fontSize: "2rem", fontWeight:"bold"}}
+          >
             Discover Destinations
           </Heading>
-          <Text fontSize="xl" color={mutedText} maxW="2xl" mx="auto">
-            Explore cities around the world, compare costs, and add destinations to your travel plans.
+
+          <Text
+            maxW="2xl"
+            mx="auto"
+            fontSize="lg"
+            color="gray.500"
+          >
+            Explore cities around the world,
+            compare costs, and add destinations
+            to your travel plans.
           </Text>
         </Box>
 
-        {/* Search and Filter */}
-        <Box mx={{ base: 4, md: 0 }}>
-          <Card.Root bg={cardBg} shadow="sm" borderRadius="2xl" p={6}>
+        {/* Search */}
+        <Card.Root>
+          <Card.Body>
             <Flex
-              direction={{ base: "column", md: "row" }}
+              direction={{
+                base: "column",
+                md: "row",
+              }}
               gap={4}
-              align="center"
             >
-              <Flex flex="1" gap={4} w="full">
-                <Box position="relative" flex="1">
-                  <Icon as={FiSearch} position="absolute" left={4} top="50%" transform="translateY(-50%)" color={mutedText} />
-                  <Input
-                    placeholder="Search cities and countries..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    pl={12}
-                    bg={useColorModeValue("gray.50", "gray.700")}
-                    border="none"
-                    _focus={{ bg: useColorModeValue("white", "gray.600") }}
-                    size="lg"
-                    borderRadius="xl"
-                  />
-                </Box>
-                <Select.Root
-                  collection={costOptions}
-                  value={filter ? [filter] : []}
-                  onValueChange={(details) =>
-                    setFilter(details.value[0] || "")
+              <InputGroup
+                flex="1"
+                startElement={<FiSearch />}
+              >
+                <Input
+                  placeholder="Search cities and countries..."
+                  value={query}
+                  onChange={(e) =>
+                    setQuery(e.target.value)
                   }
-                  maxW={{ base: "100%", md: "200px" }}
+                  size="lg"
+                  bg="bg.surface"
+                />
+              </InputGroup>
+
+              <NativeSelect.Root
+                maxW={{
+                  base: "full",
+                  md: "220px",
+                }}
+              >
+                <NativeSelect.Field
+                  placeholder="Filter by cost"
+                  value={filter}
+                  onChange={(e) =>
+                    setFilter(e.target.value)
+                  }
                 >
-                  <Select.HiddenSelect />
-                  <Select.Control>
-                    <Select.Trigger
-                      bg={useColorModeValue("gray.50", "gray.700")}
-                      border="none"
-                      _focus={{ bg: useColorModeValue("white", "gray.600") }}
-                      size="lg"
-                      borderRadius="xl"
+                  {costOptions.map((option) => (
+                    <option
+                      key={option}
+                      value={option}
                     >
-                      <Select.ValueText placeholder="Filter by cost" />
-                    </Select.Trigger>
-                    <Select.IndicatorGroup>
-                      <Select.Indicator />
-                    </Select.IndicatorGroup>
-                  </Select.Control>
-                  <Select.Positioner>
-                    <Select.Content>
-                      {costOptions.items.map((item) => (
-                        <Select.Item item={item} key={item.value}>
-                          {item.label}
-                          <Select.ItemIndicator />
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Positioner>
-                </Select.Root>
-              </Flex>
+                      {option}
+                    </option>
+                  ))}
+                </NativeSelect.Field>
+
+                <NativeSelect.Indicator />
+              </NativeSelect.Root>
             </Flex>
-          </Card.Root>
-        </Box>
+          </Card.Body>
+        </Card.Root>
 
-        {/* City Cards */}
-        <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={8} mx={{ base: 4, md: 0 }}>
-          {filteredCities.map((city) => (
-            <Card.Root
-              key={city.id}
-              bg={cardBg}
-              shadow="sm"
-              borderRadius="2xl"
-              overflow="hidden"
-              transition="all 0.3s"
-              _hover={{ transform: "translateY(-6px)", shadow: "xl" }}
-              cursor="pointer"
-              onClick={() => setSelectedCity(city)}
+        {/* Loading */}
+        {loading ? (
+          <SimpleGrid
+            columns={{
+              base: 1,
+              md: 2,
+              xl: 3,
+            }}
+            gap={6}
+          >
+            {Array.from({ length: 6 }).map(
+              (_, index) => (
+                <Card.Root key={index}>
+                  <Card.Body>
+                    <Stack gap={4}>
+                      <Skeleton height="220px" />
+                      <Skeleton height="24px" />
+                      <Skeleton height="18px" />
+                      <Skeleton height="40px" />
+                    </Stack>
+                  </Card.Body>
+                </Card.Root>
+              )
+            )}
+          </SimpleGrid>
+        ) : (
+          <>
+            {/* City Cards */}
+            <SimpleGrid
+              columns={{
+                base: 1,
+                md: 2,
+                xl: 3,
+              }}
+              gap={6}
             >
-              <AspectRatio ratio={16 / 10}>
-                <Box bg={accentBg} display="flex" alignItems="center" justifyContent="center">
-                  <Icon as={FiMapPin} boxSize={16} color={mutedText} />
-                </Box>
-              </AspectRatio>
-              <Card.Body p={6}>
-                <Flex justify="space-between" align="start" mb={3}>
-                  <Box>
-                    <Heading size="lg" mb={1} lineHeight="1.3">
-                      {city.name}
-                    </Heading>
-                    <Text color={mutedText} fontSize="md">{city.country}</Text>
+              {filteredCities.slice(0, 6).map((city) => (
+                <Card.Root
+                  key={city.id}
+                  overflow="hidden"
+                  cursor="pointer"
+                  transition="all 0.2s"
+                  _hover={{
+                    translateY: "-4px",
+                    shadow: "lg",
+                  }}
+                  onClick={() =>
+                    setSelectedCity(city)
+                  }
+                >
+                  <Box
+                    h="220px"
+                    bg="travel.subtle"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <Icon
+                      as={FiMapPin}
+                      boxSize={14}
+                      color="travel.fg"
+                    />
                   </Box>
-                  <Badge colorScheme="green" variant="subtle" px={3} py={1} fontSize="sm">
-                    {city.cost}
-                  </Badge>
-                </Flex>
 
-                <Text color={mutedText} mb={6} lineHeight="1.6">
-                  {city.details}
-                </Text>
+                  <Card.Body>
+                    <Stack gap={5}>
+                      <Flex
+                        justify="space-between"
+                        align="start"
+                      >
+                        <Box>
+                          <Heading
+                            size="lg"
+                            mb={1}
+                          >
+                            {city.name}
+                          </Heading>
 
-                <VStack spacing={3} align="stretch" mb={6}>
-                  <HStack spacing={4}>
-                    <HStack spacing={2}>
-                      <Icon as={FiStar} color="yellow.500" boxSize={4} />
-                      <Text fontSize="sm" color={mutedText}>
-                        {city.popularity}% Popular
+                          <Text color="gray.500">
+                            {city.country}
+                          </Text>
+                        </Box>
+
+                        <Badge
+                          colorPalette="green"
+                          variant="subtle"
+                          px={3}
+                          py={1}
+                          rounded="full"
+                        >
+                          {city.cost_level}
+                        </Badge>
+                      </Flex>
+
+                      <Text
+                        color="gray.500"
+                        lineHeight="tall"
+                      >
+                        Population:{" "}
+                        {city.population?.toLocaleString() ??
+                          "—"}
+                        <br />
+                        Rating:{" "}
+                        {city.tourism_rating ?? "—"}
                       </Text>
-                    </HStack>
-                  </HStack>
-                </VStack>
 
-                <Button colorScheme="blue" size="lg" w="full" borderRadius="xl">
-                  Add to trip
-                </Button>
-              </Card.Body>
-            </Card.Root>
-          ))}
-        </SimpleGrid>
+                      <VStack
+                        align="stretch"
+                        gap={3}
+                      >
+                        <HStack>
+                          <Icon
+                            as={FiStar}
+                            color="yellow.400"
+                          />
 
-        {/* Selected City Details and Map */}
+                          <Text
+                            fontSize="sm"
+                            color="gray.500"
+                          >
+                            {city.popularity_score?.toFixed(
+                              0
+                            ) ?? "—"}
+                            % Popular
+                          </Text>
+                        </HStack>
+                      </VStack>
+
+                      <Button
+                        colorPalette="travel"
+                        size="lg"
+                      >
+                        Add to Trip
+                      </Button>
+                    </Stack>
+                  </Card.Body>
+                </Card.Root>
+              ))}
+            </SimpleGrid>
+
+            {/* Empty State */}
+            {filteredCities.length === 0 && (
+              <Card.Root>
+                <Card.Body py={16}>
+                  <Stack
+                    align="center"
+                    gap={4}
+                  >
+                    <Icon
+                      as={FiSearch}
+                      boxSize={10}
+                      color="gray.400"
+                    />
+
+                    <Text
+                      fontSize="lg"
+                      color="gray.500"
+                      textAlign="center"
+                    >
+                      No cities match your search.
+                    </Text>
+                  </Stack>
+                </Card.Body>
+              </Card.Root>
+            )}
+          </>
+        )}
+
+        {/* Selected City */}
         {selectedCity && (
-          <Box mx={{ base: 4, md: 0 }}>
-            <Card.Root bg={cardBg} shadow="sm" borderRadius="2xl" p={6}>
-              <Flex direction={{ base: "column", md: "row" }} gap={6}>
+          <Card.Root overflow="hidden">
+            <Card.Body>
+              <Flex
+                direction={{
+                  base: "column",
+                  lg: "row",
+                }}
+                gap={8}
+              >
+                {/* Details */}
                 <Box flex="1">
-                  <Flex justify="space-between" align="start" mb={4}>
+                  <Stack gap={5}>
                     <Box>
-                      <Heading size="xl" mb={2} lineHeight="1.3">
+                      <Heading
+                        size="2xl"
+                        mb={2}
+                      >
                         {selectedCity.name}
                       </Heading>
-                      <Text color={mutedText} fontSize="lg" mb={2}>
+
+                      <Text
+                        fontSize="lg"
+                        color="gray.500"
+                      >
                         {selectedCity.country}
                       </Text>
-                      <Badge colorScheme="green" variant="subtle" px={3} py={1} fontSize="sm">
-                        {selectedCity.cost}
-                      </Badge>
                     </Box>
-                  </Flex>
 
-                  <Text color={mutedText} mb={6} lineHeight="1.6" fontSize="md">
-                    {selectedCity.details}
-                  </Text>
+                    <Badge
+                      w="fit-content"
+                      colorPalette="green"
+                      variant="subtle"
+                      px={3}
+                      py={1}
+                      rounded="full"
+                    >
+                      {selectedCity.cost_level}
+                    </Badge>
 
-                  <HStack spacing={4} mb={6}>
-                    <HStack spacing={2}>
-                      <Icon as={FiStar} color="yellow.500" boxSize={4} />
-                      <Text fontSize="sm" color={mutedText}>
-                        {selectedCity.popularity}% Popular
+                    <Text
+                      lineHeight="tall"
+                      color="gray.500"
+                    >
+                      Population:{" "}
+                      {selectedCity.population?.toLocaleString() ??
+                        "—"}
+                      <br />
+                      Avg food: $
+                      {selectedCity.avg_food_cost ??
+                        "0"}
+                      <br />
+                      Avg hotel: $
+                      {selectedCity.avg_hotel_cost ??
+                        "0"}
+                      <br />
+                      Avg transport: $
+                      {selectedCity.avg_transport_cost ??
+                        "0"}
+                    </Text>
+
+                    <HStack>
+                      <Icon
+                        as={FiStar}
+                        color="yellow.400"
+                      />
+
+                      <Text color="gray.500">
+                        {selectedCity.popularity_score?.toFixed(
+                          0
+                        ) ?? "—"}
+                        % Popular
                       </Text>
                     </HStack>
-                  </HStack>
 
-                  <Button colorScheme="blue" size="lg" borderRadius="xl">
-                    Add to trip
-                  </Button>
+                    <Button
+                      colorPalette="travel"
+                      size="lg"
+                      w="fit-content"
+                    >
+                      Add to Trip
+                    </Button>
+                  </Stack>
                 </Box>
 
-                <Box flex="1" minH="400px">
+                {/* Map */}
+                <Box
+                  flex="1"
+                  minH="420px"
+                  overflow="hidden"
+                  rounded="2xl"
+                  borderWidth="1px"
+                  borderColor="border.subtle"
+                >
                   <CityMap city={selectedCity} />
                 </Box>
               </Flex>
-            </Card.Root>
-          </Box>
+            </Card.Body>
+          </Card.Root>
         )}
       </Stack>
     </Box>

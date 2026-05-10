@@ -56,11 +56,11 @@ const Packing = () => {
         <Flex gap={4} direction={{ base: "column", md: "row" }}>
           <Field.Root>
             <Field.Label>Item</Field.Label>
-            <Input value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="Add new item" />
+            <Input value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="Add new item" p={4} />
           </Field.Root>
           <Field.Root>
             <Field.Label>Category</Field.Label>
-            <Input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="e.g. Essentials" />
+            <Input value={newCategory} onChange={(e) => setNewCategory(e.target.value)} placeholder="e.g. Essentials" p={4} />
           </Field.Root>
           <Button alignSelf="flex-end" colorScheme="blue" onClick={addChecklistItem}>Add</Button>
         </Flex>

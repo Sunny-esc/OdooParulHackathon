@@ -15,16 +15,20 @@ import {
   Card,
   AspectRatio,
   Icon,
+  Image,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { getDashboardData } from "../services/mockData";
+import { getTrips, getBudgetReport } from "../api/tripService";
+import { getCities } from "../api/cityService";
 import { useColorModeValue } from "../components/ui/color-mode";
 import { FiMapPin, FiCalendar, FiDollarSign, FiTrendingUp, FiPlus, FiSearch, FiCreditCard } from "react-icons/fi";
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
-  const [dashboard, setDashboard] = useState(null);
+  const [trips, setTrips] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [budgetReport, setBudgetReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -33,15 +37,55 @@ const Dashboard = () => {
   const mutedText = useColorModeValue("gray.600", "gray.300");
   const accentBg = useColorModeValue("gray.100", "gray.700");
 
+  // Dummy data for demo purposes
+  const dummyCities = [
+    { id: 1, name: "Paris", country: "France", cost_level: "$$", population: "2.1M", popularity_score: 9.5, tourism_rating: 9.8, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=400&fit=crop" },
+    { id: 2, name: "Tokyo", country: "Japan", cost_level: "$$$", population: "37.4M", popularity_score: 9.2, tourism_rating: 9.6, image: "https://images.unsplash.com/photo-1540959375944-7049f642e9c1?w=600&h=400&fit=crop" },
+    { id: 3, name: "Barcelona", country: "Spain", cost_level: "$$", population: "1.6M", popularity_score: 8.9, tourism_rating: 9.4, image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&h=400&fit=crop" },
+  ];
+
+  const dummyTrips = [
+    { id: 1, name: "European Summer", status: "Upcoming", destinationCount: 5, dates: "Jun 15 - Jul 30", budgetUsed: "$3,500 / $5,000", image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop" },
+    { id: 2, name: "Asian Adventure", status: "Upcoming", destinationCount: 4, dates: "Aug 5 - Sep 15", budgetUsed: "$2,100 / $4,000", image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=600&h=400&fit=crop" },
+    { id: 3, name: "Beach Getaway", status: "Completed", destinationCount: 2, dates: "Apr 1 - Apr 8", budgetUsed: "$1,200 / $1,500", image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=400&fit=crop" },
+  ];
+
   useEffect(() => {
-    getDashboardData().then((data) => {
-      setDashboard(data);
-      setLoading(false);
-    });
+    const fetchDashboard = async () => {
+      try {
+        const tripsData = await getTrips({ page_size: 6 });
+        setTrips(Array.isArray(tripsData) ? tripsData : tripsData.results || dummyTrips);
+
+        const citiesData = await getCities({ page_size: 3 });
+        setCities(Array.isArray(citiesData) ? citiesData : citiesData.results || dummyCities);
+
+        if (tripsData.length) {
+          const report = await getBudgetReport(tripsData[0].id);
+          setBudgetReport(report);
+        } else {
+          // Dummy budget report
+          setBudgetReport({
+            total_estimated_cost: 5500,
+          });
+        }
+      } catch (error) {
+        console.error("Dashboard fetch failed:", error);
+        // Use dummy data on error
+        setTrips(dummyTrips);
+        setCities(dummyCities);
+        setBudgetReport({
+          total_estimated_cost: 5500,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
   }, []);
 
   return (
-    <Box minH="100vh" bg={pageBg}>
+    <Box minH="100vh" bg={pageBg} p={{sm:2,md:6}}>
       <Stack spacing={12}>
         {/* Hero Section */}
         <Box
@@ -138,7 +182,7 @@ const Dashboard = () => {
             </Button>
           </Flex>
           <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6} mx={{ base: 4, md: 0 }}>
-            {(loading ? Array.from({ length: 3 }) : dashboard?.recommended || []).map((destination, index) => (
+            {(loading ? Array.from({ length: 3 }) : cities.length > 0 ? cities : dummyCities).map((destination, index) => (
               <Card.Root
                 key={destination?.id || index}
                 bg={cardBg}
@@ -149,34 +193,31 @@ const Dashboard = () => {
                 _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
               >
                 <AspectRatio ratio={16 / 9}>
-                  <Box bg={accentBg} display="flex" alignItems="center" justifyContent="center">
-                    <Icon as={FiMapPin} boxSize={12} color={mutedText} />
-                  </Box>
+                <Image
+                  src={destination?.image || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop"}
+                  alt={destination?.name}
+                  objectFit="cover"
+                  borderTopRadius="2xl"
+                />
                 </AspectRatio>
                 <Card.Body p={6}>
-                  <Skeleton isLoaded={!loading}>
                     <Flex justify="space-between" align="start" mb={3}>
                       <Box>
                         <Heading size="md" mb={1}>{destination?.name}</Heading>
                         <Text color={mutedText}>{destination?.country}</Text>
                       </Box>
                       <Badge colorScheme="purple" variant="subtle" px={3} py={1}>
-                        {destination?.cost}
+                        {destination?.cost_level || "—"}
                       </Badge>
                     </Flex>
-                  </Skeleton>
-                  <Skeleton isLoaded={!loading}>
                     <Text fontSize="sm" color={mutedText} mb={4} lineHeight="1.5">
-                      {destination?.details}
+                      Population: {destination?.population ?? "—"}, Popularity: {destination?.popularity_score ?? "—"}
                     </Text>
-                  </Skeleton>
-                  <Skeleton isLoaded={!loading}>
                     <HStack spacing={2}>
                       <Badge colorScheme="green" variant="subtle">
-                        {destination?.popularity}% Popular
+                        Rating: {destination?.tourism_rating ?? "—"}
                       </Badge>
                     </HStack>
-                  </Skeleton>
                 </Card.Body>
               </Card.Root>
             ))}
@@ -196,7 +237,9 @@ const Dashboard = () => {
                     </Box>
                     <Box>
                       <Text fontSize="sm" color={mutedText}>Total budget</Text>
-                      <Text fontSize="2xl" fontWeight="bold">$4,200</Text>
+                      <Text fontSize="2xl" fontWeight="bold">
+                        {budgetReport?.total_estimated_cost ? `$${budgetReport.total_estimated_cost}` : "$0"}
+                      </Text>
                     </Box>
                   </Flex>
                   <Badge colorScheme="green" variant="subtle">On track</Badge>
@@ -210,7 +253,9 @@ const Dashboard = () => {
                     </Box>
                     <Box>
                       <Text fontSize="sm" color={mutedText}>Spent so far</Text>
-                      <Text fontSize="2xl" fontWeight="bold">$2,930</Text>
+                      <Text fontSize="2xl" fontWeight="bold">
+                        ${budgetReport?.total_estimated_cost ? Math.floor(budgetReport.total_estimated_cost * 0.7) : 3850}
+                      </Text>
                     </Box>
                   </Flex>
                   <Badge colorScheme="blue" variant="subtle">Stable</Badge>
@@ -224,7 +269,9 @@ const Dashboard = () => {
                     </Box>
                     <Box>
                       <Text fontSize="sm" color={mutedText}>Remaining</Text>
-                      <Text fontSize="2xl" fontWeight="bold">$1,270</Text>
+                      <Text fontSize="2xl" fontWeight="bold">
+                        ${budgetReport ? (budgetReport.total_estimated_cost ? (10000 - budgetReport.total_estimated_cost) : 4500) : 4500}
+                      </Text>
                     </Box>
                   </Flex>
                   <Badge colorScheme="orange" variant="subtle">Good progress</Badge>
@@ -236,7 +283,11 @@ const Dashboard = () => {
           <Box>
             <Heading size="xl" mb={8}>Quick actions</Heading>
             <VStack spacing={4} align="stretch">
-              {(loading ? Array.from({ length: 3 }) : dashboard?.quickActions || []).map((action, index) => (
+              {(loading ? Array.from({ length: 3 }) : [
+              { id: 1, title: "Plan new itinerary", description: "Start a new trip plan from scratch." },
+              { id: 2, title: "Search cities", description: "Discover destinations that fit your style." },
+              { id: 3, title: "Track spending", description: "Keep your budget aligned with your plan." },
+            ]).map((action, index) => (
                 <Card.Root
                   key={action?.id || index}
                   bg={cardBg}
@@ -247,12 +298,10 @@ const Dashboard = () => {
                   cursor="pointer"
                 >
                   <Card.Body p={5}>
-                    <Skeleton isLoaded={!loading}>
                       <Text fontWeight="semibold" mb={1} fontSize="lg">{action?.title}</Text>
-                    </Skeleton>
-                    <Skeleton isLoaded={!loading}>
+                  
                       <Text fontSize="sm" color={mutedText}>{action?.description}</Text>
-                    </Skeleton>
+                
                   </Card.Body>
                 </Card.Root>
               ))}
@@ -274,7 +323,7 @@ const Dashboard = () => {
             </Button>
           </Flex>
           <SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} gap={6} mx={{ base: 4, md: 0 }}>
-            {(loading ? Array.from({ length: 3 }) : dashboard?.previousTrips || []).map((trip, index) => (
+            {(loading ? Array.from({ length: 3 }) : (Array.isArray(trips) && trips.length > 0) ? trips : dummyTrips).map((trip, index) => (
               <Card.Root
                 key={trip?.id || index}
                 bg={cardBg}
@@ -285,12 +334,14 @@ const Dashboard = () => {
                 _hover={{ transform: "translateY(-4px)", shadow: "xl" }}
               >
                 <AspectRatio ratio={16 / 9}>
-                  <Box bg={accentBg} display="flex" alignItems="center" justifyContent="center">
-                    <Icon as={FiMapPin} boxSize={12} color={mutedText} />
-                  </Box>
+                  <Image
+                    src={trip?.image || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&h=400&fit=crop"}
+                    alt={trip?.name}
+                    objectFit="cover"
+                    borderTopRadius="2xl"
+                  />
                 </AspectRatio>
                 <Card.Body p={6}>
-                  <Skeleton isLoaded={!loading} mb={4}>
                     <Flex justify="space-between" align="center">
                       <Heading size="lg">{trip?.name}</Heading>
                       <Badge
@@ -302,8 +353,6 @@ const Dashboard = () => {
                         {trip?.status}
                       </Badge>
                     </Flex>
-                  </Skeleton>
-                  <Skeleton isLoaded={!loading} mb={3}>
                     <HStack spacing={4} color={mutedText}>
                       <HStack spacing={1}>
                         <Icon as={FiMapPin} boxSize={4} />
@@ -314,17 +363,12 @@ const Dashboard = () => {
                         <Text fontSize="sm">{trip?.dates}</Text>
                       </HStack>
                     </HStack>
-                  </Skeleton>
-                  <Skeleton isLoaded={!loading} mb={4}>
                     <Text fontWeight="semibold" color="green.600">
                       Budget used: {trip?.budgetUsed}
                     </Text>
-                  </Skeleton>
-                  <Skeleton isLoaded={!loading}>
                     <Button size="sm" variant="outline" colorScheme="blue" w="full">
                       View trip details
                     </Button>
-                  </Skeleton>
                 </Card.Body>
               </Card.Root>
             ))}

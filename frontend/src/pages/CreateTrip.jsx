@@ -18,10 +18,16 @@ import {
   AspectRatio,
   Icon,
   HStack,
+  FileUpload,
 } from "@chakra-ui/react";
+import { toaster } from "../components/ui/toaster";
 import { useColorModeValue } from "../components/ui/color-mode";
-import { getDestinations, getActivities } from "../services/mockData";
+import { getActivities } from "../services/mockData";
+import { getCities } from "../api/cityService";
+import { useNavigate } from "react-router-dom";
+import { createTrip } from "../api/tripService";
 import { FiMapPin, FiPlus } from "react-icons/fi";
+import { HiUpload } from "react-icons/hi";
 
 const CreateTrip = () => {
   const [formValues, setFormValues] = useState({
@@ -34,13 +40,27 @@ const CreateTrip = () => {
   const [destinations, setDestinations] = useState([]);
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    Promise.all([getDestinations(), getActivities()]).then(([dest, act]) => {
-      setDestinations(dest);
-      setActivities(act);
-      setLoading(false);
-    });
+    const loadSuggestions = async () => {
+      try {
+        const [dest, act] = await Promise.all([
+          getCities({ page_size: 3 }),
+          getActivities(),
+        ]);
+        setDestinations(Array.isArray(dest) ? dest : dest.results || []);
+        setActivities(act);
+      } catch (error) {
+        console.error("Failed to load suggestions", error);
+        setDestinations([]);
+        setActivities([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSuggestions();
   }, []);
 
   const handleChange = (field) => (event) => {
@@ -48,9 +68,65 @@ const CreateTrip = () => {
     setFormValues((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Trip created successfully. This page is powered by the mocked frontend layer.");
+
+    if (!formValues.name || !formValues.startDate || !formValues.endDate) {
+      toaster.create({
+        title: "Missing details",
+        description: "Please enter a trip name and valid dates before saving.",
+        status: "warning",
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (formValues.endDate < formValues.startDate) {
+      toaster.create({
+        title: "Invalid date range",
+        description: "End date must be the same or after the start date.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", formValues.name);
+    formData.append("description", formValues.description);
+    formData.append("start_date", formValues.startDate);
+    formData.append("end_date", formValues.endDate);
+    formData.append("is_public", "true");
+    if (formValues.cover) {
+      formData.append("cover_image", formValues.cover);
+    }
+
+    try {
+      setLoading(true);
+      await createTrip(formData);
+      console.log("reached here")
+      toaster.create({
+        title: "Trip created",
+        description: "Your itinerary has been saved successfully.",
+        status: "success",
+        duration: 4000,
+        isClosable: true,
+      });
+      navigate("/trips");
+    } catch (error) {
+      console.error("Create trip failed", error);
+      toaster.create({
+        title: "Unable to create trip",
+        description: "There was a problem saving your trip. Please try again.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const pageBg = useColorModeValue("gray.50", "gray.900");
@@ -62,7 +138,7 @@ const CreateTrip = () => {
     <Box minH="100vh" bg={pageBg}>
       <Stack spacing={12}>
         <Box textAlign="center" py={12}>
-          <Heading size="2xl" mb={4} color="blue.600">
+          <Heading size="2xl" mb={4} color="travel.fg" style={{ fontSize: "2rem", fontWeight:"bold"}}>
             Plan Your Dream Trip
           </Heading>
           <Text fontSize="xl" color={mutedText} maxW="2xl" mx="auto">
@@ -86,20 +162,25 @@ const CreateTrip = () => {
                       border="none"
                       _focus={{ bg: useColorModeValue("white", "gray.600") }}
                       borderRadius="xl"
+                      p={4}
                     />
                   </Field.Root>
                   <Field.Root>
                     <Field.Label fontSize="lg" fontWeight="semibold">Cover image</Field.Label>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleChange("cover")}
-                      size="lg"
-                      bg={useColorModeValue("gray.50", "gray.700")}
-                      border="none"
-                      _focus={{ bg: useColorModeValue("white", "gray.600") }}
-                      borderRadius="xl"
-                    />
+                    <FileUpload.Root>
+      <FileUpload.HiddenInput />
+      <FileUpload.Trigger asChild>
+        <Button variant="outline" size="sm">
+          <HiUpload /> Upload file
+        </Button>
+      </FileUpload.Trigger>
+      <FileUpload.List />
+    </FileUpload.Root>
+                    {formValues.cover && (
+                      <Text fontSize="sm" mt={2} color={mutedText}>
+                        Selected cover: {formValues.cover.name}
+                      </Text>
+                    )}
                   </Field.Root>
                   <Field.Root>
                     <Field.Label fontSize="lg" fontWeight="semibold">Start date</Field.Label>
@@ -222,6 +303,8 @@ const CreateTrip = () => {
                     shadow="lg"
                     _hover={{ transform: "translateY(-2px)", shadow: "xl" }}
                     transition="all 0.2s"
+                    isLoading={loading}
+                    loadingText="Creating"
                   >
                     Create trip
                   </Button>

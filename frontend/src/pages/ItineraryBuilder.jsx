@@ -60,10 +60,10 @@ const ItineraryBuilder = () => {
   const accentBg = useColorModeValue("gray.100", "gray.700");
 
   return (
-    <Box minH="100vh" bg={pageBg}>
+    <Box minH="100vh" bg={pageBg} p={{sm:2,md:6}}>
       <Stack spacing={12}>
         <Box textAlign="center" py={12}>
-          <Heading size="2xl" mb={4} color="blue.600">
+          <Heading size="2xl" mb={4} color="travel.fg" style={{ fontSize: "2rem", fontWeight:"bold"}}>
             Build Your Itinerary
           </Heading>
           <Text fontSize="xl" color={mutedText} maxW="2xl" mx="auto">
@@ -194,6 +194,7 @@ const ItineraryBuilder = () => {
                       border="none"
                       _focus={{ bg: useColorModeValue("white", "gray.600") }}
                       borderRadius="xl"
+                      p={4}
                     />
                   </Field.Root>
                   <Field.Root>
@@ -206,6 +207,7 @@ const ItineraryBuilder = () => {
                       border="none"
                       _focus={{ bg: useColorModeValue("white", "gray.600") }}
                       borderRadius="xl"
+                      p={4}
                     />
                   </Field.Root>
                   <Button colorScheme="blue" size="lg" borderRadius="xl" onClick={addStop}>

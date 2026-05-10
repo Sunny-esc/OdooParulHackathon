@@ -56,15 +56,15 @@ const Profile = () => {
             <Stack spacing={4}>
               <Field.Root>
                 <Field.Label>Name</Field.Label>
-                <Input value={form.name} onChange={handleChange("name")} />
+                <Input value={form.name} onChange={handleChange("name")} p={4} />
               </Field.Root>
               <Field.Root>
                 <Field.Label>Email</Field.Label>
-                <Input value={form.email} onChange={handleChange("email")} />
+                <Input value={form.email} onChange={handleChange("email")} p={4} />
               </Field.Root>
               <Field.Root>
                 <Field.Label>Home city</Field.Label>
-                <Input value={form.city} onChange={handleChange("city")} />
+                <Input value={form.city} onChange={handleChange("city")} p={4} />
               </Field.Root>
               <Button colorScheme="blue" onClick={handleSave}>Save changes</Button>
             </Stack>

@@ -15,6 +15,7 @@ import Packing from "./pages/Packing";
 import SharedItinerary from "./pages/SharedItinerary";
 import Profile from "./pages/Profile";
 import Journal from "./pages/Journal";
+import { Toaster } from "./components/ui/toaster";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Layout from "./components/Layout";
@@ -41,6 +42,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
+        <Toaster />
       </Box>
     </Layout>
   );
