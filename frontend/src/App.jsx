@@ -1,51 +1,50 @@
-import { Routes, Route } from "react-router-dom";
-import { useContext } from "react"; // Added this
-import { AuthContext } from "./context/AuthContext"; // Added this
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Box, Container } from "@chakra-ui/react";
 
 import Login from "./auth/login";
 import Register from "./auth/register";
+import Dashboard from "./pages/Dashboard";
+import CreateTrip from "./pages/CreateTrip";
+import MyTrips from "./pages/MyTrips";
+import ItineraryBuilder from "./pages/ItineraryBuilder";
+import ItineraryView from "./pages/ItineraryView";
+import CitySearch from "./pages/CitySearch";
+import ActivitySearch from "./pages/ActivitySearch";
+import Budget from "./pages/Budget";
+import Packing from "./pages/Packing";
+import SharedItinerary from "./pages/SharedItinerary";
+import Profile from "./pages/Profile";
+import Journal from "./pages/Journal";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
-import Navbar from "../components/NavBar";
-
-const Dashboard = () => {
-  const { user } = useContext(AuthContext);
-
-  return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto bg-white shadow-md rounded-lg p-6 border border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
-        <h2 className="text-lg text-indigo-600 mt-2">
-          Hello, {user?.username || "User"}!
-        </h2>
-      </div>
-    </div>
-  );
-};
+import Layout from "./components/Layout";
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navbar must be OUTSIDE Routes */}
-      <Navbar />
-
-      <main className="container mx-auto">
-        <Routes>
-          <Route path="/register" element={<Register />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          {/* Optional: Redirect root to login */}
-          <Route path="/" element={<Login />} />
-        </Routes>
-      </main>
-    </div>
+    <Layout>
+      <Box minH="100vh" bg="bg">
+        <Container maxW="container.xl" py={6}>
+          <Routes>
+            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/create-trip" element={<ProtectedRoute><CreateTrip /></ProtectedRoute>} />
+            <Route path="/trips" element={<ProtectedRoute><MyTrips /></ProtectedRoute>} />
+            <Route path="/itinerary-builder" element={<ProtectedRoute><ItineraryBuilder /></ProtectedRoute>} />
+            <Route path="/itinerary-view" element={<ProtectedRoute><ItineraryView /></ProtectedRoute>} />
+            <Route path="/cities" element={<ProtectedRoute><CitySearch /></ProtectedRoute>} />
+            <Route path="/activities" element={<ProtectedRoute><ActivitySearch /></ProtectedRoute>} />
+            <Route path="/budget" element={<ProtectedRoute><Budget /></ProtectedRoute>} />
+            <Route path="/packing" element={<ProtectedRoute><Packing /></ProtectedRoute>} />
+            <Route path="/shared-itinerary" element={<ProtectedRoute><SharedItinerary /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/journal" element={<ProtectedRoute><Journal /></ProtectedRoute>} />
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </Routes>
+        </Container>
+      </Box>
+    </Layout>
   );
 }
 
